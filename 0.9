@@ -1,0 +1,196 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct person{
+	int status;
+	bool head=false;
+	bool alive=true;
+}per[1000];
+
+int n,ID[1000],red,blk,flag_out,flag_head,flag_vote=0,add=0,day,eyes;
+double votes[1000];
+map <int,string> color;
+
+
+void init()
+{
+	memset(ID+1,1,n);
+	for(int i=1;i<=red;i++)
+	{
+		int temp=rand()%n+1;
+		if(ID[temp])
+		{
+			per[temp].status=1;
+			ID[temp]=0;
+		}
+	}
+	
+	for(int i=1;i<=n;i++)
+		if(per[i].status!=1)
+			per[i].status=0;//black
+			
+	cout<<"身份分配完毕"<<endl; 
+}
+
+void vote_head()
+{
+	cout<<"开始村长选举"<<endl; 
+	int max=-1;
+	memset(votes+1,0,n);
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			int temp;
+			cout<<"请票选村长：\n";
+			cin>>temp;
+			votes[temp]+=1;
+			if(max<votes[temp])
+			{
+				max=votes[temp];
+				flag_head=temp;
+			}
+			else if(max==votes[temp])//票数相同，序号小的当选 
+				flag_head=min(flag_head,temp);
+		}
+	}
+	per[flag_head].head=true;
+	cout<<flag_head<<"号当选村长"<<endl; 
+}
+
+void find_pre(int pos)
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==1) pos=n;
+		else pos--;
+		if(per[pos].alive)
+			break;
+	}
+}
+
+void find_next(int pos)
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==n) pos=1;
+		else pos++;
+		if(per[pos].alive) 
+			break;
+	}
+}
+
+void speak()
+{
+	int pos=flag_head;
+	char direction;
+	cout<<"村长，请选择发言顺序（L or R）：\n";
+	cin>>direction;
+	
+	if(direction=='L')
+		find_pre(pos);
+	else 
+		find_next(pos);
+	
+	for(int i=1;i<=red+blk;i++)
+	{
+		char speech[300];				
+		cout<<pos<<"号玩家请发言：\n";
+		gets(speech);
+		cout<<speech<<endl;
+		if(direction=='L')
+			find_pre(pos);
+		else 
+			find_next(pos);
+	}
+}
+
+void vote_out()
+{
+	cout<<"开始放逐投票"<<endl; 
+	double max=-1.0;
+	memset(votes+1,0,n);
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			int temp;
+			cout<<"请票选出局者：\n";
+			cin>>temp;
+			if(per[i].head) 
+				votes[temp]+=0.5+(n-1)%2+add;
+			else
+				votes[temp]+=1.0;
+			
+			if(max<votes[temp])
+			{
+				max=votes[temp];
+				flag_out=temp;
+			}
+		}
+	}
+	per[flag_out].alive=false;
+	if(per[flag_out].status==0) red--;
+	else blk--;	
+	cout<<flag_out<<"号玩家被放逐，其身份为"<<color[per[flag_out].status]<<endl;
+	if(per[flag_out].head)
+	{
+	 	flag_vote=0;
+		cout<<"村长之位空缺"<<endl; 
+	}
+}
+
+void night()
+{
+	day=rand()%2;
+	cout<<color[day]<<" night"<<endl;
+	eyes=0;
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			char eye;
+			cout<<"是否睁眼(Y or N):\n";
+			cin>>eye;
+			if(eye=='Y'&&per[i].status==day) 
+				eyes++;
+		}
+	}
+	if(eyes%2==0)
+		add=1;
+	cout<<"天亮了"<<endl;
+}
+
+int main()
+{
+	cin>>n;
+	red=(n+1)/2;
+	blk=n-red;
+	color[0]="black";
+	color[1]="red";
+	init();
+	while(1)
+	{
+		if(flag_vote==0)
+			vote_head();
+		speak();
+		vote_out();
+		night();
+		if(red==0)
+		{
+			cout<<"black win!"<<endl;
+			break;
+		}
+		else if(blk==0)
+		{
+			cout<<"red win!"<<endl;
+			break;
+		}
+		else if(red==1&&blk==1&&flag_vote==0)
+		{
+			cout<<"和局"<<endl;
+			break; 
+		}
+	}
+	return 0;
+}
