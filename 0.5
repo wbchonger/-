@@ -1,0 +1,170 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct person{
+	int status;
+	bool head=false;
+	bool alive=true;
+}per[1000];
+
+int n,ID[1000],red,blk,flag_out,flag_head,flag_vote=0,add=0;
+double votes[1000];
+
+void init()
+{
+	memset(ID+1,1,n);
+	for(int i=1;i<=red;i++)
+	{
+		int temp=rand()%n+1;
+		if(ID[temp])
+		{
+			per[temp].status=0;//red
+			ID[temp]=0;
+		}
+	}
+	
+	for(int i=1;i<=n;i++)
+		if(!per[i].status)
+			per[i].status=1;//black
+}
+
+void vote_head()
+{
+	int max=-1;
+	memset(votes+1,0,n);
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			int temp;
+			cout<<"请票选村长：\n";
+			cin>>temp;
+			votes[temp]+=1;
+			if(max<votes[temp])
+			{
+				max=votes[temp];
+				flag_head=temp;
+			}
+		}
+	}
+	per[flag_head].head=true;
+}
+
+void find_pre(int pos)
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==1) pos=n;
+		else pos--;
+		if(per[pos].alive)
+			break;
+	}
+}
+
+void find_next(int pos)
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==n) pos=1;
+		else pos++;
+		if(per[pos].alive) 
+			break;
+	}
+}
+
+void speak()
+{
+	int pos=flag_head;
+	char direction;
+	cout<<"村长，请选择发言顺序（L or R）：\n";
+	cin>>direction;
+	if(direction=='L')
+	{
+		for(int i=1;i<=n;i++)
+		{
+			if(per[pos].alive)
+			{
+				char speech[300];				
+				cout<<pos<<"号玩家请发言：\n";
+				gets(speech);
+			}
+			if(pos==n) pos=1;
+			else pos++;
+		}
+	} 
+	else
+	{
+		for(int i=1;i<=n;i++)
+		{
+			if(per[pos].alive)
+			{
+				char speech[300];
+				cout<<pos<<"号玩家请发言：\n";
+				gets(speech);
+			}
+			if(pos==1) pos==n;
+			else pos--;
+		}
+	}
+}
+
+void vote_out()
+{
+	double max=-1.0;
+	memset(votes+1,0,n);
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			int temp;
+			cout<<"请票选出局者：\n";
+			cin>>temp;
+			if(per[i].head) 
+				votes[temp]+=0.5+(n-1)%2+add;
+			else
+				votes[temp]+=1.0;
+			
+			if(max<votes[temp])
+			{
+				max=votes[temp];
+				flag_out=temp;
+			}
+		}
+	}
+	per[flag_out].alive=false;
+	if(per[flag_out].head) flag_vote=0;
+	if(per[flag_out].status==0) red--;
+	else blk--;
+}
+
+void night()
+{
+	
+}
+
+int main()
+{
+	cin>>n;
+	red=(n+1)/2;
+	init();
+	blk=n-red;
+	while(1)
+	{
+		if(flag_vote==0)
+			vote_head();
+		speak();
+		vote_out();
+		night();
+		if(red==0)
+		{
+			cout<<"black win!"<<endl;
+			break;
+		}
+		if(blk==0)
+		{
+			cout<<"red win!"<<endl;
+			break;
+		}
+	}
+	return 0;
+}
