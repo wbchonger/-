@@ -1,0 +1,336 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct person{
+	int status;
+	bool head=false;
+	bool alive=true;
+}per[1000];
+struct id_votes{
+	int id;
+	int v;
+};
+int n,red,blk,flag_out,flag_head,flag_vote=0,add=0,day,eyes,pos;
+double votes[1000];
+map <int,string> color;
+
+
+void init()
+{
+	srand((unsigned)time(NULL));
+	int id[1000]={0};
+	
+	for(int i=1;i<=red;i++)
+	{
+		int temp=rand()%n+1;
+		if(id[temp]==0)
+		{
+//			cout<<temp<<endl;
+			per[temp].status=1;
+			id[temp]=1;
+		}
+		else
+			i--;
+	}
+//	cout<<endl;
+	
+	for(int i=1;i<=n;i++)
+		if(per[i].status!=1)
+			per[i].status=0;//black
+//	
+	for(int i=1;i<=n;i++)
+		cout<<per[i].status<<" ";
+	cout<<endl;
+	
+	cout<<"身份分配完毕"<<endl; 
+	
+	cout<<endl;
+}
+
+bool check(int temp)
+{
+	if(temp<1||temp>n||!per[temp].alive)
+		return false;
+	return true;
+}
+
+int cmp(id_votes a,id_votes b)
+{
+    if(a.v!=b.v) return a.v>b.v;
+    else return a.id<b.id;
+}
+
+void vote_head()
+{
+	cout<<"开始村长选举\n\n"; 
+
+	id_votes cnt[n+1];
+	for(int i=1;i<=n;i++)
+	{
+		cnt[i].id=i;
+		cnt[i].v=0;	
+	}
+	int max=0;	
+	
+	while(cnt[1].v==cnt[2].v)
+	{
+		cout<<"发言环节：\n";	
+		for(int i=1;i<=n;i++) 
+		{
+			if(cnt[i].v==max&&per[cnt[i].id].alive)
+			{
+				cout<<cnt[i].id<<"号玩家请发言：\n";
+				char speech[300];
+				cin>>speech;
+				cout<<speech<<endl;
+			}
+		}
+		
+		cout<<"投票环节：\n";
+		max=0;
+		for(int i=1;i<=n;i++)
+		{
+			cnt[i].v=0;
+			cnt[i].id=i;
+		}
+		
+		for(int i=1;i<=n;i++)
+		{
+			if(per[i].alive)
+			{
+				cout<<"请票选村长：\n";
+				int temp;
+				while(1)
+				{
+					cin>>temp;
+					if(!check(temp))
+						cout<<"查无此人，请重新选择：\n";
+					else //if()
+						break;
+				}
+				cnt[temp].v+=1;
+				if(max<cnt[temp].v)
+				{
+					max=cnt[temp].v;
+					flag_head=temp;
+				}
+			}
+		}
+		cout<<"\n投票结果为：\n"; 
+		for(int i=1;i<=n;i++)
+			cout<<cnt[i].v<<" ";
+		cout<<endl<<endl;
+		
+		sort(cnt+1,cnt+n+1,cmp);
+		
+		for(int i=1;i<=n;i++)
+			cout<<cnt[i].id<<" "<<cnt[i].v<<endl;
+		
+		if(cnt[1].v==cnt[2].v)	
+			cout<<"多名玩家票数相同，继续选村长\n";
+	}
+	
+	per[flag_head].head=true;
+	cout<<flag_head<<"号当选村长"<<endl; 
+	flag_vote=1;
+	
+	cout<<endl;
+}
+
+void find_pre()
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==1) pos=n;
+		else pos--;
+		if(per[pos].alive)
+			break;
+	}
+}
+
+void find_next()
+{
+	for(int i=1;i<=n;i++)
+	{
+		if(pos==n) pos=1;
+		else pos++;
+		if(per[pos].alive) 
+			break;
+	}
+}
+
+void speak()
+{
+	cout<<"进入讨论环节\n\n";
+	pos=flag_head;
+	char direction;
+	cout<<"村长，请选择发言顺序（L or R）：\n";
+	cin>>direction;
+	getchar();
+	if(direction=='L')
+	{
+		find_pre();
+		for(int i=1;i<=n;i++)
+		{
+			if(per[pos].alive)
+			{
+				char speech[300];				
+				cout<<pos<<"号玩家请发言：\n";
+				gets(speech);
+				cout<<speech<<endl;
+			}
+			if(pos==n) pos=1;
+			else pos++;
+		}
+	} 
+	else
+	{
+		find_next();
+		for(int i=1;i<=n;i++)
+		{
+			if(per[pos].alive)
+			{
+				char speech[300];
+				cout<<pos<<"号玩家请发言：\n";
+				gets(speech);
+				cout<<speech<<endl;
+			}
+			if(pos==1) pos=n;
+			else pos--;
+		}
+	}
+	
+	cout<<endl;
+}
+
+bool game_end();
+
+void vote_out()
+{
+	cout<<"开始放逐投票\n\n"; 
+	double max=-1.0;
+	memset(votes+1,0,sizeof(votes));
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			cout<<"请票选出局者：\n";
+			int temp;			
+			while(1)
+			{
+				cin>>temp;
+				if(!check(temp))
+					cout<<"查无此人，请重新选择：\n";
+				else
+					break;
+			}
+			if(per[i].head) 
+				votes[temp]+=0.5+(n-1)%2+add;
+			else
+				votes[temp]+=1.0;
+			
+			if(max<votes[temp])
+			{
+				max=votes[temp];
+				flag_out=temp;
+			}
+		}
+	}
+//	
+	cout<<"\n投票结果为：\n"; 
+	for(int i=1;i<=n;i++)
+		cout<<votes[i]<<" ";
+	cout<<endl<<endl;
+	
+	per[flag_out].alive=false;
+	if(per[flag_out].status==1) red--;
+	else blk--;	
+	cout<<flag_out<<"号玩家被放逐，其身份为"<<color[per[flag_out].status]<<endl;
+	if(per[flag_out].head)
+	{
+	 	flag_vote=0;
+//	 	if(!game_end())
+			cout<<"\n村长之位空缺\n"; 
+	}
+	cout<<endl;
+}
+
+void night()
+{
+	srand((unsigned)time(NULL));
+	day=rand()%2;
+	cout<<color[day]<<" night\n\n";
+	eyes=0;
+	for(int i=1;i<=n;i++)
+	{
+		if(per[i].alive)
+		{
+			char eye;
+			cout<<"是否睁眼(Y or N):\n";
+			cin>>eye;
+			if(eye=='Y'&&per[i].status==day) 
+				eyes++;
+		}
+	}
+	add=0;
+	if(eyes%2==0)
+		add=1;
+	cout<<"\n村长额外票数为："<<add<<endl;
+	cout<<"\n天亮了"<<endl;
+	
+	cout<<endl;
+}
+
+bool game_end()
+{
+	if(red==0)
+	{
+		cout<<"black win!"<<endl;
+		return true;
+	}
+	else if(blk==0)
+	{
+		cout<<"red win!"<<endl;
+		return true;
+	}
+	else if(red==1&&blk==1&&flag_vote==0)
+	{
+		cout<<"和局"<<endl;
+		return true; 
+	}
+	
+	return false;
+}
+
+int main()
+{
+	cout<<"请输入参加人数：\n";
+	while(1)
+	{
+		cin>>n;
+		if(n<3||n>999)
+			cout<<"不合理的人数，请重新输入：\n";
+		else 
+			break;
+	}
+	cout<<endl;
+	
+	red=(n+1)/2;
+	blk=n-red;
+	cout<<"红色方有"<<red<<"人\n";
+	cout<<"黑色方有"<<blk<<"人\n";
+	
+	color[0]="black";
+	color[1]="red";
+	
+	init();
+	while(1)
+	{
+		if(flag_vote==0) vote_head();
+		speak();
+		vote_out();
+		if(game_end()) break;
+		night();
+	}
+	return 0;
+}
