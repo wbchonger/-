@@ -1,0 +1,344 @@
+#include "vote.h"
+#include "ui_vote.h"
+#include "number.h"
+#include "start.h"
+#include <bits/stdc++.h>
+#include <QDebug>
+#include "mystruct.h"
+#include <QTime>
+
+extern person per[25];
+int vote::position=1;
+int vote::i=0;
+int vote::flag_head=0;
+int vote::flag_out=0;
+int vote::schedule=0;
+int vote::add=0;
+int eyes=0,day,flag_vote;
+double vote::max=0;
+char order;
+id_votes cnt[25];
+//QMap(const int=1,QString="red");
+
+vote::vote(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::vote)
+{
+    ui->setupUi(this);
+
+    ui->Public_screen->append
+            ("身份分配完毕， "/*有"+QString::number(start::red)+"人为红，"
+             +QString::number(start::blk)+"人为黑，*/ "请点击continue开始游戏！");
+    ui->pushButton->hide();
+    ui->Send->hide();
+    ui->Next->hide();
+    ui->L->hide();
+    ui->R->hide();
+    ui->Yes->hide();
+    ui->No->hide();
+
+}
+
+vote::~vote()
+{
+    delete ui;
+}
+
+
+void vote::on_Next_clicked()
+{
+    ui->System_screen->clear();
+    ui->Information->clear();
+    
+    if(schedule==1)
+    {
+        ui->System_screen->append("请在输入框输入并按Send发言");
+
+        ui->Send->show();
+    }
+
+    if(schedule==2||schedule==4)
+    {
+        ui->System_screen->append("请按Vote投票");
+        ui->System_screen->append(QString::number(flag_head));
+        ui->pushButton->show();
+    }
+
+    if(schedule==3)
+    {
+        ui->System_screen->append("请在输入框输入并按Send发言");
+
+        ui->Send->show();
+    }
+
+    if(schedule==5)
+    {
+        ui->System_screen->append("请按'Yes'或'No'选择睁眼或闭眼！");
+        if(i<=start::n)
+        {
+            ui->Yes->show();
+            ui->No->show();
+        }
+//        else{
+
+//        }
+
+    }
+
+    //information
+
+    {
+    ui->Information->append("序号："+QString::number(vote::position));
+
+    if(per[vote::position].status==1)
+        ui->Information->append("身份：red");
+    else
+        ui->Information->append("身份：black");
+
+    if(per[vote::position].alive)
+        ui->Information->append("状态：alive");
+    else
+        ui->Information->append("状态：out");
+
+    if(per[vote::position].head)
+        ui->Information->append("职位：村长");
+    else
+        ui->Information->append("状态：村民");
+    }
+    if(order=='r'&&schedule==3)
+    {
+        if(vote::position==1) vote::position=start::n;
+        else vote::position--;
+    }
+    else
+    {
+        if(vote::position==start::n) vote::position=1;
+        else vote::position++;
+    }
+
+}
+
+//0：竞选村长，1：投票选村长，2：交流讨论，3：投票放逐，4：夜晚
+void vote::on_Continue_clicked()
+{
+    ui->System_screen->clear();
+    ui->Information->clear();
+    ui->Input->clear();
+
+    ui->Next->show();
+
+    if(schedule==0)
+    {
+        ui->Public_screen->append("村长竞选环节，请按Next开始！");
+        position=1;
+        i=1;
+        
+        schedule++;
+    }
+    else if(schedule==1)
+    {
+        ui->Public_screen->append("村长选举投票，请按Next开始！");
+        position=1;
+        for(int i=1;i<=start::n;i++)
+        {
+            cnt[i].id=i;
+            cnt[i].v=0;
+        }
+        max=0;
+        i=1;
+
+        schedule++;
+    }
+    else if(schedule==2)
+    {
+        ui->Public_screen->append("交流讨论环节");
+        position=flag_head;
+        i=1;
+        ui->Public_screen->append("请村长选择发言顺序");
+        ui->R->show();
+        ui->L->show();
+
+        schedule++;
+    }
+    else if(schedule==3)
+    {
+        ui->Public_screen->append("投票放逐,请按Next开始！");
+        position=1;
+        for(int i=1;i<=start::n;i++)
+        {
+            cnt[i].id=i;
+            cnt[i].v=0;
+        }
+        max=0;
+        i=1;
+
+        schedule++;
+    }
+    else if(schedule==4)
+    {
+        QTime t;
+        t=QTime::currentTime();
+        qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+        day=qrand()%2;
+        if(day==0)
+            ui->Public_screen->append("进入黑夜");
+        else
+            ui->Public_screen->append("进入红夜");
+        ui->Public_screen->append("请按Next继续！");
+        eyes=0;
+        i=0;
+
+        schedule++;
+    }
+    else if(schedule==5)
+    {
+        ui->Public_screen->append("天亮了！");
+        per[flag_head].ballot=0.5+(start::n-1)%2+add;
+        if(add)
+            ui->Public_screen->append(",村长拥有额外一票");
+
+        ui->Public_screen->append("请按Continue继续！");
+
+        if(flag_vote==1)
+            schedule=0;
+        else
+            schedule=2;
+    }
+}
+
+void vote::on_Send_clicked()
+{
+    if(order=='r'&&schedule==3)
+    {
+        if(vote::position==start::n) vote::position=1;
+        else vote::position++;
+    }
+    else
+    {
+        if(vote::position==1) vote::position=start::n;
+        else vote::position--;
+    }
+
+    if(i<=start::n)
+    {
+        QString str=ui->Input->toPlainText();
+        QString tip("玩家序号："+QString::number(vote::position));
+        if(str==NULL)
+        {
+            ui->System_screen->append("发言为空，请重新输入！");
+        }
+        else
+        {
+            ui->Public_screen->append(tip);
+            ui->Public_screen->append(str);
+            ui->Send->hide();
+//            ui->Input->clear();
+            if(i==start::n)
+            {
+                ui->Public_screen->append("发言环节结束,请按Continue继续！");
+                ui->Information->clear();
+                ui->Next->hide();
+            }
+
+            i++;
+        }
+    }
+
+    if(order=='r'&&schedule==3)
+    {
+        if(vote::position==1) vote::position=start::n;
+        else vote::position--;
+    }
+    else
+    {
+        if(vote::position==start::n) vote::position=1;
+        else vote::position++;
+    }
+}
+
+void vote::on_pushButton_clicked()
+{
+    if(vote::i<=start::n)
+    {
+        choose.show();
+        ui->pushButton->hide();
+    }
+
+    if(vote::i==start::n)
+    {
+        ui->pushButton->setText("结束");
+        ui->pushButton->show();
+        ui->Next->hide();
+    }
+
+    if(vote::i==start::n+1)
+    {
+        ui->Public_screen->append("投票结束,结果如下");
+        for(int k=1;k<=start::n;k++)
+        {
+            ui->Public_screen->
+                    append(QString::number(cnt[k].id)+" "+QString::number(cnt[k].v));
+        }
+        ui->pushButton->setText("Vote");
+        ui->pushButton->hide();
+
+        if(schedule==2)
+        {
+            per[flag_head].head=true;
+            per[flag_head].ballot=0.5+(start::n-1)%2+add;
+            ui->Public_screen->append(QString::number(flag_head)+"号玩家当选村长！");
+            ui->Public_screen->append("请按Continue继续！");
+            ui->Information->clear();
+        }
+        else if(schedule==4)
+        {
+            per[flag_out].alive=false;
+            ui->Public_screen->append
+                    (QString::number(flag_out)+"号玩家被放逐，其身份为："+
+                     QString::number(per[flag_out].status));
+            if(per[flag_out].head)
+            {
+                ui->Public_screen->append("村长职位空缺！");
+                flag_vote=1;
+            }
+            ui->Information->clear();
+        }
+    }
+}
+
+void vote::on_L_clicked()
+{
+    order='l';
+    if(position==1) position=start::n;
+    else position--;
+    ui->Public_screen->append("从村长左侧开始依次发言：");
+    ui->R->hide();
+    ui->L->hide();
+}
+
+void vote::on_R_clicked()
+{
+    order='r';
+    if(position==start::n) position=1;
+    else position++;
+    ui->Public_screen->append("从村长右侧开始依次发言：");
+    ui->R->hide();
+    ui->L->hide();
+}
+
+void vote::on_Yes_clicked()
+{
+    if(per[position].status==day)
+        eyes++;
+    add=(eyes+1)%2;
+    ui->Yes->hide();
+    ui->No->hide();
+    i++;
+}
+
+void vote::on_No_clicked()
+{
+    ui->Yes->hide();
+    ui->No->hide();
+    i++;
+}
