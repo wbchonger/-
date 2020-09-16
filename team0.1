@@ -1,0 +1,205 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QIcon>
+#include <QSoundEffect>
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    //设置背景音乐
+    QSoundEffect *login=new QSoundEffect(this);
+    login->setSource(QUrl::fromLocalFile(":/res/gamemusice.wav"));
+    //参数-循环播放
+    login->setLoopCount(QSoundEffect::Infinite);
+    //设置音量，0-1
+    login->setVolume(0.8f);
+    login->play();
+
+    QIcon icon1,icon2,icon3;
+    icon1.addFile(tr(":/res/1.jpg"));
+    ui->ranklist->setIcon(icon1);
+    ui->ranklist->setFlat(true);
+    ui->ranklist->setIconSize(QSize(379,618));
+    icon2.addFile(tr(":/res/2.jpg"));
+    ui->startgame->setIcon(icon2);
+    ui->startgame->setFlat(true);
+    ui->startgame->setIconSize(QSize(379,618));
+    icon3.addFile(tr(":/res/3.jpg"));
+    ui->closegame->setIcon(icon3);
+    ui->closegame->setFlat(true);
+    ui->closegame->setIconSize(QSize(379,618));
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+//开始游戏
+void MainWindow::on_startgame_clicked()
+{
+    gamepromoter=new game;
+    gamepromoter->show();
+}
+
+//结束程序
+void MainWindow::on_closegame_clicked()
+{
+
+}
+
+//排行榜
+void MainWindow::on_ranklist_clicked()
+{
+
+}
+
+
+#include "game.h"
+#include "ui_game.h"
+
+
+//extern int abo_occurrences ;//阿波（蓝狗出现的最大限制变量
+//extern int abo_timeinterval;//图片刷新时间变量
+//extern int Max_error ;//玩家失误的最多次数变量
+//extern int Gametime_minutes ;//游戏倒计时时间变量
+//extern int Score_victory;//玩家胜利得分变量
+
+game::game(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::game)
+{
+    ui->setupUi(this);
+//    this->setWindowIcon(QIcon(":/res/tudoulove.jpg"));//窗口icon
+    this->setWindowTitle ("游戏界面");//窗口文字标题
+
+//    Players_score = 0;//初始化玩家得分为0
+//    Players_error= Max_error;//初始化玩家最大失误次数等于设置好的Max_error变量
+//    Time_over = Gametime_minutes*60;//游戏结束倒计时变量等于设置的Gametime_minutes*60，一分钟60秒
+    players=0;
+    profit=0;
+    rank=150;
+
+    Lable_init();//初始gameworid游戏界面中的所有label控件
+    ReFreshImage_1();//刷新label中的图片，使得所有label的图片都为空
+
+//    timeinterval_id = startTimer(1000*abo_timeinterval);//开启Qt定时器图片刷新间隔
+//    countdown_id =startTimer(1000);//开启Qt定时器每秒钟刷新时间显示
+//    gametime_id =startTimer(Time_over*1000);//开启Qt定时器开启Qt定时器
+
+
+//    ui->time->display (Time_over);//开启游戏显示
+//    ui->fault->display (Players_error);//开启玩家错误显示
+//    ui->playscore->display (Players_score);//开启玩家分数显示
+
+    ui->players->display (players);//开启玩家人数显示
+    ui->profit ->display (profit);//开启充值总额显示
+    ui->rank   ->display (rank);//开启畅销排行显示
+
+}
+
+game::~game()
+{
+    delete ui;
+}
+
+void game::on_close_clicked()
+{
+    this->close();
+    delete this;
+}
+
+/********************************************
+函数名：Lable_init()
+入口参数：无
+出口参数：无
+功能：初始game游戏界面中的所有label控件，
+使插入的图片可以自动按照比例调整大小适应Lable控件。
+**********************************************/
+void game::Lable_init()
+{
+    ui->label->setScaledContents(true);
+    ui->label_2->setScaledContents(true);
+    ui->label_3->setScaledContents(true);
+    ui->label_4->setScaledContents(true);
+    ui->label_5->setScaledContents(true);
+    ui->label_6->setScaledContents(true);
+    ui->label_7->setScaledContents(true);
+    ui->label_8->setScaledContents(true);
+    ui->label_9->setScaledContents(true);
+    ui->label_10->setScaledContents(true);
+    ui->label_11->setScaledContents(true);
+    ui->label_12->setScaledContents(true);
+    ui->label_13->setScaledContents(true);
+    ui->label_14->setScaledContents(true);
+    ui->label_15->setScaledContents(true);
+    ui->label_16->setScaledContents(true);
+    ui->label_17->setScaledContents(true);
+    ui->label_18->setScaledContents(true);
+    ui->label_19->setScaledContents(true);
+    ui->label_20->setScaledContents(true);
+    ui->label_21->setScaledContents(true);
+    ui->label_22->setScaledContents(true);
+    ui->label_23->setScaledContents(true);
+    ui->label_24->setScaledContents(true);
+    ui->label_25->setScaledContents(true);
+    ui->label_26->setScaledContents(true);
+    ui->label_27->setScaledContents(true);
+    ui->label_28->setScaledContents(true);
+    ui->label_29->setScaledContents(true);
+    ui->label_30->setScaledContents(true);
+    ui->label_31->setScaledContents(true);
+    ui->label_32->setScaledContents(true);
+    ui->label_33->setScaledContents(true);
+    ui->label_34->setScaledContents(true);
+    ui->label_35->setScaledContents(true);
+    ui->label_36->setScaledContents(true);
+    ui->label_37->setScaledContents(true);
+    ui->label_38->setScaledContents(true);
+    ui->label_39->setScaledContents(true);
+    ui->label_40->setScaledContents(true);
+    ui->label_41->setScaledContents(true);
+    ui->label_42->setScaledContents(true);
+    ui->label_43->setScaledContents(true);
+    ui->label_44->setScaledContents(true);
+    ui->label_45->setScaledContents(true);
+    ui->label_46->setScaledContents(true);
+    ui->label_47->setScaledContents(true);
+    ui->label_48->setScaledContents(true);
+    ui->label_49->setScaledContents(true);
+
+    ui->label_50->setScaledContents(true);
+    ui->label_51->setScaledContents(true);
+    ui->label_52->setScaledContents(true);
+    ui->label_53->setScaledContents(true);
+    ui->label_54->setScaledContents(true);
+}
+
+/*******************************************************************
+函数名：ReFreshImage_1（）
+入口参数：无
+出口参数：无
+功能：刷新label中的图片，使得所有label的图片都为空
+*******************************************************************/
+void game::ReFreshImage_1 ()
+{
+    QObjectList list = ui->groupBox->children();
+    QLabel *labelimage;
+    QImage *img = new QImage;
+    img->load(":/res/5.jpg");
+    int i=0;
+    foreach (QObject *obj, list)
+    {
+       labelimage = qobject_cast<QLabel*>(obj);
+       if(labelimage)
+        {
+          labelimage->setPixmap(QPixmap::fromImage(*img));
+          lable_flag[i] = false;
+           i++;
+           //qDebug()<<i;
+        }
+     }
+}
