@@ -1,0 +1,83 @@
+#ifndef HELP_H
+#define HELP_H
+
+#include <QWidget>
+#include "shezhi.h"
+
+namespace Ui {
+class help;
+}
+
+class help : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit help(QWidget *parent = 0);
+    ~help();
+
+private slots:
+    void on_tuichu_clicked();
+
+    void on_pushButton_clicked();
+
+private:
+    Ui::help *ui;
+    shezhi w;
+};
+
+#endif // HELP_H
+
+
+#include "help.h"
+#include "ui_help.h"
+#include<QIcon>
+
+help::help(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::help)
+{
+    ui->setupUi(this);
+
+    QIcon icon1,icon2,icon3,icon4,icon5,icon6;
+    icon1.addFile(tr(":/res/baokuan.jpg"));
+    ui->baokuan->setIcon(icon1);
+    ui->baokuan->setFlat(true);
+    ui->baokuan->setIconSize(QSize(200,200));
+    icon2.addFile(tr(":/res/mycompany2.jpg"));
+    ui->ziji->setIcon(icon2);
+    ui->ziji->setFlat(true);
+    ui->ziji->setIconSize(QSize(200,200));
+    icon3.addFile(tr(":/res/qita.jpg"));
+    ui->easy->setIcon(icon3);
+    ui->easy->setFlat(true);
+    ui->easy->setIconSize(QSize(200,200));
+    icon4.addFile(tr(":/res/tuiguang.jpg"));
+    ui->tuiguang->setIcon(icon4);
+    ui->tuiguang->setFlat(true);
+    ui->tuiguang->setIconSize(QSize(200,200));
+    icon5.addFile(tr(":/res/youxidachang.jpg"));
+    ui->dachang->setIcon(icon5);
+    ui->dachang->setFlat(true);
+    ui->dachang->setIconSize(QSize(200,200));
+    icon6.addFile(tr(":/res/gameover.jpg"));
+    ui->tuichu->setIcon(icon6);
+    ui->tuichu->setFlat(true);
+    ui->tuichu->setIconSize(QSize(200,200));
+
+}
+
+help::~help()
+{
+    delete ui;
+}
+
+void help::on_tuichu_clicked()
+{
+    close();
+}
+
+void help::on_pushButton_clicked()
+{
+    w.show();
+}
