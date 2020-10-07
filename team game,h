@@ -1,0 +1,103 @@
+#ifndef GAME_H
+#define GAME_H
+
+#include <QMainWindow>
+#include <QSoundEffect>
+#include <QWidget>
+#include <QCursor>
+#include <QtGui>
+#include <QtCore>
+#include <QObjectList>
+#include <QObject>
+#include <QTimer>
+#include <QTimerEvent>
+#include <QDebug>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QMessageBox>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include "buff.h"
+#include "shezhi.h"
+
+//每个label所需要的数据整合为一个类
+struct mylabel{
+    int type;
+    int guard;
+    bool flag=false;
+
+    int road;
+    int x;
+    int y;
+    QImage *img;
+};
+
+namespace Ui {
+class game;
+}
+
+class game : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit game(QWidget *parent = 0);
+    ~game();
+
+    static int computers;//电脑数
+    static int staff;//拉人能力
+    static int wall;//防举报等级
+    static int report;//举报等级
+    static int recharge;//玩家充值率
+    static int flag;
+
+    void Lable_init();//初始gameworid游戏界面中的所有label控件
+    void ReFreshImage_1();//刷新label中的图片，使得所有label的图片都为空
+    void ReFreshImage_2(int occurrences);//随机出现新游戏，同时记录被刷新的位置
+    void ImageSwitcher_1(QLabel *label);//切换传入的label的图片
+    void updata();//更新各项积分
+    void totalsum(int number);//更新总收入
+    void Click_right();//当玩家点击正确
+//    void Click_error();//当玩家点击错误
+//    void Game_victory();//当玩家游戏胜利
+    void Game_failed();//当玩家游戏失败
+    void timerEvent ( QTimerEvent * ev);//Qt定时器执行函数
+    void mousePressEvent(QMouseEvent *);//Qt鼠标点击执行函数
+
+
+private slots:
+    void on_close_clicked();
+
+private:
+    int players;//玩家人数
+    int profit;//总充值额
+    int rank;//畅销排行
+    int dangers;//被举报数
+    int fever;//游戏热度，每秒增长人数
+    int poach;//抢人速度
+    int working_computer;//工作的电脑的数目
+    int working_staff;//工作的员工的数目
+
+    int i;
+    int time_over;//游戏倒计时
+    int time_month;//当前月份
+    int time_day;//当前日期
+    int gametime_id;//游戏结束的Qt定时器id变量
+    int countdown_id;//游戏结束的Qt定时器id变量
+    int timeinterval_id;//图片刷新的Qt定时器id变量
+    int bufftime_id;//buff刷新的Qt定时器id变量
+    int companytype[55];
+    bool lable_flag[55] = {false};
+    /*false 代表无法点击 true代表可以点击阿波出现。
+      49个label控制键本应设为lable_flag[49]。
+      但不为何会造成数组溢出，程序异常结束。
+      因此设为55防止数组溢出，保证程序正常运行。
+    */
+
+    mylabel company[55];//
+
+    Ui::game *ui;
+};
+
+#endif // GAME_H
