@@ -1,0 +1,70 @@
+#ifndef SHEZHI_H
+#define SHEZHI_H
+
+#include <QWidget>
+#include <qDebug>
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
+#include <QSoundEffect>
+
+namespace Ui {
+class shezhi;
+}
+
+class shezhi : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit shezhi(QWidget *parent = 0);
+    ~shezhi();
+private slots:
+    void on_horizontalSlider_actionTriggered(int action);//游戏时间变量的滑动条
+
+    void on_pushButton_clicked();
+
+private:
+    Ui::shezhi *ui;
+};
+
+extern int Gametime ;//游戏倒计时时间变量
+
+#endif // SHEZHI_H
+
+
+#include "shezhi.h"
+#include "ui_shezhi.h"
+
+int Gametime = 3;//游戏倒计时时间变量
+
+shezhi::shezhi(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::shezhi)
+{
+    ui->setupUi(this);
+    this->setWindowTitle ("游戏设置");//窗口文字设置
+    //初始化各个游戏数据显示以及滑动条位置
+    ui->time->display (Gametime);
+    ui->horizontalSlider->setValue(Gametime);
+}
+
+
+void shezhi::on_horizontalSlider_actionTriggered(int action)
+{
+    QSoundEffect *login=new QSoundEffect(this);
+    login->setSource(QUrl::fromLocalFile(":/res/Slidermusic.wav"));
+    login->play();
+    Gametime = ui->horizontalSlider->value ();
+    ui->time->display (Gametime);
+    //qDebug() << "Gametime"<<Gametime;
+}
+
+shezhi::~shezhi()
+{
+    delete ui;
+}
+
+void shezhi::on_pushButton_clicked()
+{
+    close();
+}
