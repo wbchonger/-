@@ -1,0 +1,160 @@
+#include "buff.h"
+#include "ui_buff.h"
+
+buff::buff(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::buff)
+{
+    ui->setupUi(this);
+
+    if(1);
+
+    setWindowTitle("请选择你的导师：");
+
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    bufftype1=qrand()%5;
+    //picture
+    QIcon icon1,icon2,icon3,icon4,icon5;
+    switch (bufftype1)
+    {
+    case 0:
+        icon1.addFile(tr(":/res/lianxianjia1.jpg"));
+        ui->buff1->setIcon(icon1);
+        ui->buff1->setFlat(true);
+        ui->buff1->setIconSize(QSize(379,618));
+        break;
+    case 1:
+        icon2.addFile(tr(":/res/warenjia2.jpg"));
+        ui->buff1->setIcon(icon2);
+        ui->buff1->setFlat(true);
+        ui->buff1->setIconSize(QSize(379,618));
+        break;
+    case 2:
+        icon3.addFile(tr(":/res/jubao.jpg"));
+        ui->buff1->setIcon(icon3);
+        ui->buff1->setFlat(true);
+        ui->buff1->setIconSize(QSize(379,618));
+        break;
+    case 3:
+        icon4.addFile(tr(":/res/kejing.jpg"));
+        ui->buff1->setIcon(icon4);
+        ui->buff1->setFlat(true);
+        ui->buff1->setIconSize(QSize(379,618));
+        break;
+    case 4:
+        icon5.addFile(tr(":/res/fangjubao.jpg"));
+        ui->buff1->setIcon(icon5);
+        ui->buff1->setFlat(true);
+        ui->buff1->setIconSize(QSize(379,618));
+        break;
+    default:
+        break;
+    }
+
+    bufftype2=qrand()%5;
+    while(bufftype2==bufftype1)
+        bufftype2=qrand()%5;
+    //picture
+    switch (bufftype2)
+    {
+    case 0:
+        icon1.addFile(tr(":/res/lianxianjia1.jpg"));
+        ui->buff2->setIcon(icon1);
+        ui->buff2->setFlat(true);
+        ui->buff2->setIconSize(QSize(379,618));
+        break;
+    case 1:
+        icon2.addFile(tr(":/res/warenjia2.jpg"));
+        ui->buff2->setIcon(icon2);
+        ui->buff2->setFlat(true);
+        ui->buff2->setIconSize(QSize(379,618));
+        break;
+    case 2:
+        icon3.addFile(tr(":/res/jubao.jpg"));
+        ui->buff2->setIcon(icon3);
+        ui->buff2->setFlat(true);
+        ui->buff2->setIconSize(QSize(379,618));
+        break;
+    case 3:
+        icon4.addFile(tr(":/res/kejing.jpg"));
+        ui->buff2->setIcon(icon4);
+        ui->buff2->setFlat(true);
+        ui->buff2->setIconSize(QSize(379,618));
+        break;
+    case 4:
+        icon5.addFile(tr(":/res/fangjubao.jpg"));
+        ui->buff2->setIcon(icon5);
+        ui->buff2->setFlat(true);
+        ui->buff2->setIconSize(QSize(379,618));
+        break;
+    default:
+        break;
+    }
+}
+
+buff::~buff()
+{
+    delete ui;
+}
+
+
+
+void buff::on_buff1_clicked()
+{
+    switch (bufftype1)
+    {
+    case 0:
+        game::computers+=1;
+        qDebug()<<"com"<<game::computers;
+        break;
+    case 1:
+        game::staff+=2;
+        qDebug()<<"sta"<<game::staff;
+        break;
+    case 2:
+        game::report+=1;
+        qDebug()<<"rep"<<game::report;
+        break;
+    case 3:
+        game::recharge+=5;
+        qDebug()<<"rec"<<game::recharge;
+        break;
+    case 4:
+        game::wall+=1;
+        qDebug()<<"wal"<<game::wall;
+        break;
+    default:
+        break;
+    }
+    close();
+}
+
+void buff::on_buff2_clicked()
+{
+    switch (bufftype2)
+    {
+    case 0:
+        game::computers+=1;
+        qDebug()<<"com"<<game::computers;
+        break;
+    case 1:
+        game::staff+=2;
+        qDebug()<<"sta"<<game::staff;
+        break;
+    case 2:
+        game::report+=1;
+        qDebug()<<"rep"<<game::report;
+        break;
+    case 3:
+        game::recharge+=5;
+        qDebug()<<"rec"<<game::recharge;
+        break;
+    case 4:
+        game::wall+=1;
+        qDebug()<<"wal"<<game::wall;
+        break;
+    default:
+        break;
+    }
+    close();
+}
