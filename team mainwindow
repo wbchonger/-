@@ -1,0 +1,61 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QIcon>
+#include <QSoundEffect>
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    this->setWindowIcon(QIcon(":/res/game.jpg"));//窗口icon
+    this->setWindowTitle ("游戏推广员");//窗口文字标题
+
+    //设置背景音乐
+    QSoundEffect *login=new QSoundEffect(this);
+    login->setSource(QUrl::fromLocalFile(":/res/gamemusice.wav"));
+    //参数-循环播放
+    login->setLoopCount(QSoundEffect::Infinite);
+    //设置音量，0-1
+    login->setVolume(0.8f);
+    login->play();
+
+    QIcon icon1,icon2,icon3;
+    icon1.addFile(tr(":/res/ranklist.jpg"));
+    ui->ranklist->setIcon(icon1);
+    ui->ranklist->setFlat(true);
+    ui->ranklist->setIconSize(QSize(379,618));
+    icon2.addFile(tr(":/res/gamestart.jpg"));
+    ui->startgame->setIcon(icon2);
+    ui->startgame->setFlat(true);
+    ui->startgame->setIconSize(QSize(379,618));
+    icon3.addFile(tr(":/res/gameover.jpg"));
+    ui->closegame->setIcon(icon3);
+    ui->closegame->setFlat(true);
+    ui->closegame->setIconSize(QSize(379,618));
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+//开始游戏
+void MainWindow::on_startgame_clicked()
+{
+    gamepromoter=new game;
+    gamepromoter->show();
+}
+
+//结束程序
+void MainWindow::on_closegame_clicked()
+{
+
+}
+
+//帮助
+void MainWindow::on_ranklist_clicked()
+{
+    w.show();
+}
