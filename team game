@@ -1,0 +1,723 @@
+#include "game.h"
+#include "ui_game.h"
+
+int game::computers=2;
+int game::staff=6;
+int game::wall=0;
+int game::report=2;
+int game::recharge=0;
+int game::flag=0;
+//extern
+int occurrences=5;//游戏出现的最大限制变量
+//extern
+int timeinterval=4;//图片刷新时间变量
+//extern
+int threshold=20 ;//玩家最多被举报次数变量
+extern int Gametime;//游戏倒计时时间变量
+//extern int Score_victory;//玩家胜利得分变量
+
+game::game(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::game)
+{
+    ui->setupUi(this);
+
+    this->setWindowIcon(QIcon(":/res/game.jpg"));//窗口icon
+    this->setWindowTitle ("游戏界面");//窗口文字标题
+
+//    Players_score = 0;//初始化玩家得分为0
+//    Players_error= Max_error;//初始化玩家最大失误次数等于设置好的Max_error变量
+    players=0;
+    profit=0;
+    rank=150;
+    fever=2;
+    poach=0;
+    dangers=0;
+    working_computer=0;
+    working_staff=0;
+
+    Lable_init();//初始gameworid游戏界面中的所有label控件
+    ReFreshImage_1();//刷新label中的图片，使得所有label的图片都为空
+
+    time_over = Gametime*30;//游戏结束倒计时变量等于设置的Gametime*30
+    timeinterval_id = startTimer(1000*timeinterval);//开启Qt定时器图片刷新间隔
+    countdown_id =startTimer(1000);//开启Qt定时器每秒钟刷新时间显示
+    gametime_id =startTimer(time_over*1000);//开启Qt定时器开启Qt定时器
+    bufftime_id =startTimer(30*1000);//出现buff的时间
+
+    time_month=1;
+    time_day=1;
+    ui->month->display(time_month);
+    ui->day->display (time_day);//开启游戏倒计时显示
+//    ui->fault->display (Players_error);//开启玩家错误显示
+//    ui->playscore->display (Players_score);//开启玩家分数显示
+
+    ui->players->display (players);//开启玩家人数显示
+    ui->profit ->display (profit);//开启充值总额显示
+    ui->rank   ->display (rank);//开启畅销排行显示
+    ui->dangers->display(dangers);//开启被举报数显示
+
+    QLabel *labelimage;
+    QImage *img = new QImage;
+    QSize laSize;
+    QImage image1;
+    img->load(":/res/players.jpg");
+    labelimage=ui->label_53;
+    labelimage->setPixmap(QPixmap::fromImage(*img));
+    laSize=labelimage->size();//label_carema是要显示图片的label的名称
+    image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+    img->load(":/res/profit.jpg");
+    labelimage=ui->label_51;
+    labelimage->setPixmap(QPixmap::fromImage(*img));
+    laSize=labelimage->size();//label_carema是要显示图片的label的名称
+    image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+    img->load(":/res/rank.jpg");
+    labelimage=ui->label_52;
+    labelimage->setPixmap(QPixmap::fromImage(*img));
+    laSize=labelimage->size();//label_carema是要显示图片的label的名称
+    image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+    img->load(":/res/dangers.jpg");
+    labelimage=ui->label_55;
+    labelimage->setPixmap(QPixmap::fromImage(*img));
+    laSize=labelimage->size();//label_carema是要显示图片的label的名称
+    image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+}
+
+game::~game()
+{
+    delete ui;
+}
+
+void game::on_close_clicked()
+{
+    this->close();
+    delete this;
+}
+
+/********************************************
+函数名：Lable_init()
+入口参数：无
+出口参数：无
+功能：初始game游戏界面中的所有label控件，
+使插入的图片可以自动按照比例调整大小适应Lable控件。
+**********************************************/
+void game::Lable_init()
+{
+    ui->label->setScaledContents(true);
+    ui->label_2->setScaledContents(true);
+    ui->label_3->setScaledContents(true);
+    ui->label_4->setScaledContents(true);
+    ui->label_5->setScaledContents(true);
+    ui->label_6->setScaledContents(true);
+    ui->label_7->setScaledContents(true);
+    ui->label_8->setScaledContents(true);
+    ui->label_9->setScaledContents(true);
+    ui->label_10->setScaledContents(true);
+    ui->label_11->setScaledContents(true);
+    ui->label_12->setScaledContents(true);
+    ui->label_13->setScaledContents(true);
+    ui->label_14->setScaledContents(true);
+    ui->label_15->setScaledContents(true);
+    ui->label_16->setScaledContents(true);
+    ui->label_17->setScaledContents(true);
+    ui->label_18->setScaledContents(true);
+    ui->label_19->setScaledContents(true);
+    ui->label_20->setScaledContents(true);
+    ui->label_21->setScaledContents(true);
+    ui->label_22->setScaledContents(true);
+    ui->label_23->setScaledContents(true);
+    ui->label_24->setScaledContents(true);
+    ui->label_25->setScaledContents(true);
+    ui->label_26->setScaledContents(true);
+    ui->label_27->setScaledContents(true);
+    ui->label_28->setScaledContents(true);
+    ui->label_29->setScaledContents(true);
+    ui->label_30->setScaledContents(true);
+    ui->label_31->setScaledContents(true);
+    ui->label_32->setScaledContents(true);
+    ui->label_33->setScaledContents(true);
+    ui->label_34->setScaledContents(true);
+    ui->label_35->setScaledContents(true);
+    ui->label_36->setScaledContents(true);
+    ui->label_37->setScaledContents(true);
+    ui->label_38->setScaledContents(true);
+    ui->label_39->setScaledContents(true);
+    ui->label_40->setScaledContents(true);
+    ui->label_41->setScaledContents(true);
+    ui->label_42->setScaledContents(true);
+    ui->label_43->setScaledContents(true);
+    ui->label_44->setScaledContents(true);
+    ui->label_45->setScaledContents(true);
+    ui->label_46->setScaledContents(true);
+    ui->label_47->setScaledContents(true);
+    ui->label_48->setScaledContents(true);
+    ui->label_49->setScaledContents(true);
+
+    ui->label_50->setScaledContents(true);
+    ui->label_51->setScaledContents(true);
+    ui->label_52->setScaledContents(true);
+    ui->label_53->setScaledContents(true);
+    ui->label_54->setScaledContents(true);
+}
+
+/*******************************************************************
+函数名：ReFreshImage_1（）
+入口参数：无
+出口参数：无
+功能：刷新label中的图片，使得所有label的图片都为空
+*******************************************************************/
+void game::ReFreshImage_1 ()
+{
+    QObjectList list = ui->groupBox->children();
+    QLabel *labelimage;
+    QImage *img = new QImage;
+    img->load(":/res/5.jpg");
+    int i=0;
+    foreach (QObject *obj, list)
+    {
+       labelimage = qobject_cast<QLabel*>(obj);
+       if(labelimage)
+        {
+          labelimage->setPixmap(QPixmap::fromImage(*img));
+//          lable_flag[i] = false;
+
+          company[i].flag=false;
+
+           i++;
+           //qDebug()<<i;
+        }
+     }
+    switch (staff)
+    {
+        case 2: img->load(":/res/mycompany2.jpg");
+                break;
+        case 4: img->load(":/res/mycompany4.jpg");
+                break;
+        case 6: img->load(":/res/mycompany6.jpg");
+                break;
+        case 8: img->load(":/res/mycompany8.jpg");
+                break;
+        case 10: img->load(":/res/mycompany10.jpg");
+                break;
+        default:
+        break;
+    }
+//    img->load(":/res/poaching.jpg");
+    labelimage=qobject_cast<QLabel*>(list.value(25));
+    labelimage->setPixmap(QPixmap::fromImage(*img));
+    QSize laSize=labelimage->size();//label_carema是要显示图片的label的名称
+    QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+//    lable_flag[25] =true;
+
+    company[25].flag=true;
+}
+
+/*******************************************************************
+函数名：ReFreshImage_2（）
+入口参数：int occurrences 其他游戏每次刷新最大的出现数量
+出口参数：无
+功能：随机刷新label的一部分图片，变成其他游戏，同时记录被刷新的位置。
+用bool型lable_flag数组保存记录。
+********************************************************************/
+void game::ReFreshImage_2(int occurrences)
+{
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    QLabel *labelimage;
+    QObjectList list = ui->groupBox->children();
+    QImage *img = new QImage;
+
+    occurrences =  qrand()%occurrences+1;
+    for(int i=0; i<occurrences; i++)
+     {
+        int test =qrand()%50;
+        //qDebug()<<test;
+        labelimage=qobject_cast<QLabel*>(list.value(test));
+        if(labelimage && test!=25)
+        {
+            company[test].flag=true;
+            company[test].type=qrand()%4;
+            company[test].guard=(qrand()%5+1)*2;
+//            if(test==18||test==24||test==26||test==32)
+            {
+//                type=3;
+//                poach-=players/100;
+            }
+            switch(company[test].type)
+            {
+                case 0: //img->load(":/res/qita.jpg");
+                        switch (company[test].guard)
+                        {
+                            case 2: img->load(":/res/easy2.jpg");
+                                    break;
+                            case 4: img->load(":/res/easy4.jpg");
+                                    break;
+                            case 6: img->load(":/res/easy6.jpg");
+                                    break;
+                            case 8: img->load(":/res/easy8.jpg");
+                                    break;
+                            case 10: img->load(":/res/easy10.jpg");
+                                    break;
+                            default:
+                            break;
+                        }
+                        break;
+                case 1: //img->load(":/res/baokuan.jpg");
+                        switch (company[test].guard)
+                        {
+                            case 2: img->load(":/res/baokuan2.jpg");
+                                    break;
+                            case 4: img->load(":/res/baokuan4.jpg");
+                                    break;
+                            case 6: img->load(":/res/baokuan6.jpg");
+                                    break;
+                            case 8: img->load(":/res/baokuan8.jpg");
+                                    break;
+                            case 10: img->load(":/res/baokuan10.jpg");
+                                    break;
+                            default:
+                            break;
+                        }
+                        break;
+                case 2: //img->load(":/res/youxidachang.jpg");
+                        switch (company[test].guard)
+                        {
+                            case 2: img->load(":/res/dachang2.jpg");
+                                    break;
+                            case 4: img->load(":/res/dachang4.jpg");
+                                    break;
+                            case 6: img->load(":/res/dachang6.jpg");
+                                    break;
+                            case 8: img->load(":/res/dachang8.jpg");
+                                    break;
+                            case 10: img->load(":/res/dachang10.jpg");
+                                    break;
+                            default:
+                            break;
+                        }
+                        break;
+                case 3: //img->load(":/res/tuiguang.jpg");
+                        switch (company[test].guard)
+                        {
+                            case 2: img->load(":/res/tuiguang2.jpg");
+                                    break;
+                            case 4: img->load(":/res/tuiguang4.jpg");
+                                    break;
+                            case 6: img->load(":/res/tuiguang6.jpg");
+                                    break;
+                            case 8: img->load(":/res/tuiguang8.jpg");
+                                    break;
+                            case 10: img->load(":/res/tuiguang10.jpg");
+                                    break;
+                            default:
+                            break;
+                        }
+                        poach-=players/50;
+                        break;
+            }
+           labelimage->setPixmap(QPixmap::fromImage(*img));
+           QSize laSize=labelimage->size();//label_carema是要显示图片的label的名称
+           QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+           labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+//           int guard=qrand()%8+1;
+//           lable_flag[test] =true;
+//           companytype[test]=type;
+         }
+      }
+}
+
+/*******************************************************************
+函数名：totalsum(int number)
+入口参数：number 每天新增人数
+出口参数：无
+功能：更新充值总额
+********************************************************************/
+void game::totalsum(int number)
+{
+    int sum=0;
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    for(int i=1;i<=number;i++)
+    {
+        int j;
+        j=qrand()%(20+recharge);
+        sum=sum+j;
+    }
+    profit=profit+sum;
+}
+
+/*******************************************************************
+函数名：updata()
+入口参数：无
+出口参数：无
+功能：更新各项积分
+********************************************************************/
+void game::updata()
+{
+    fever=2+poach+players/100;
+    players+=fever;
+    ui->players->display (players);
+    totalsum(fever);
+    ui->profit->display (profit);
+    if(profit>=350)rank=149;
+    if(profit>=730)rank=148;
+    if(profit>=1330)rank=140;
+    if(profit>=2000)rank=132;
+    if(profit>=2371)rank=110;
+    if(profit>=2650)rank=92;
+    if(profit>=3340)rank=82;
+    if(profit>=4050)rank=60;
+    if(profit>=4460)rank=40;
+    if(profit>=4530)rank=39;
+    if(profit>=4590)rank=38;
+    if(profit>=4640)rank=37;
+    if(profit>=4710)rank=36;
+    if(profit>=4780)rank=35;
+    if(profit>=4970)rank=34;
+    if(profit>=5010)rank=33;
+    if(profit>=5060)rank=32;
+    if(profit>=5140)rank=31;
+    if(profit>=5240)rank=30;
+    if(profit>=5410)rank=29;
+    if(profit>=5470)rank=28;
+    if(profit>=5710)rank=27;
+    if(profit>=5970)rank=25;
+    if(profit>=6190)rank=24;
+    if(profit>=6512)rank=23;
+    if(profit>=6600)rank=22;
+    if(profit>=6730)rank=21;
+    if(profit>=7110)rank=20;
+    if(profit>=7230)rank=19;
+    if(profit>=7360)rank=18;
+    if(profit>=7540)rank=17;
+    if(profit>=7629)rank=16;
+    if(profit>=7734)rank=15;
+    if(profit>=7900)rank=14;
+    if(profit>=8080)rank=13;
+    if(profit>=8180)rank=12;
+    if(profit>=8272)rank=11;
+    if(profit>=8476)rank=10;
+    if(profit>=8790)rank=9;
+    if(profit>=8890)rank=8;
+    if(profit>=9083)rank=7;
+    if(profit>=9236)rank=6;
+    if(profit>=9469)rank=5;
+    if(profit>=9582)rank=3;
+    if(profit>=9724)rank=2;
+    if(profit>=9945)rank=1;
+    ui->rank   ->display (rank);//开启畅销排行显示
+    ui->dangers->display(dangers);
+}
+
+/*******************************************************************
+函数名：timerEvent( QTimerEvent* ev)
+入口参数：无
+出口参数：无
+功能：Qt定时器执行函数，包含刷新图片函数，游戏失败函数，游戏倒计时显示。
+********************************************************************/
+void  game::timerEvent ( QTimerEvent* ev)
+{
+    if( ev->timerId ()== timeinterval_id)
+    {
+        poach=0;
+        working_computer=0;
+        working_staff=0;
+        ReFreshImage_1();
+        ReFreshImage_2(occurrences);
+    }
+    if(ev->timerId () == gametime_id)
+    {
+        Game_failed();
+
+    }
+    if(ev->timerId()==bufftime_id)
+    {
+        buff *BUFF=new buff;
+        BUFF->move(1000,100);
+        BUFF->show();
+    }
+    if (ev->timerId ()== countdown_id)
+    {
+        //恢复图片
+        QObjectList list = ui->groupBox->children();
+        QLabel *labelimage;
+        QImage *img = new QImage;
+//        img->load(":/res/poaching.jpg");
+        switch (staff)
+        {
+            case 2: img->load(":/res/mycompany2.jpg");
+                    break;
+            case 4: img->load(":/res/mycompany4.jpg");
+                    break;
+            case 6: img->load(":/res/mycompany6.jpg");
+                    break;
+            case 8: img->load(":/res/mycompany8.jpg");
+                    break;
+            case 10: img->load(":/res/mycompany10.jpg");
+                    break;
+            default:
+            break;
+        }
+        labelimage=qobject_cast<QLabel*>(list.value(25));
+        labelimage->setPixmap(QPixmap::fromImage(*img));
+        QSize laSize=labelimage->size();//label_carema是要显示图片的label的名称
+        QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+        labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+        //日期更新
+        --time_over;
+        time_day++;
+        time_month+=time_day/31;
+        if(time_day>30)
+            time_day=time_day%30;
+        ui->month->display(time_month);
+        ui->day->display (time_day);
+
+        //更新数据
+        updata();
+
+        //判断失败
+        if(dangers>=threshold)
+        {
+            dangers=0;//防止连续弹窗
+            QString  str = "被多家游戏公司联合举报，游戏结束！";
+            QMessageBox::question(this,"游戏失败",str,QMessageBox::Yes, QMessageBox::No );
+            Game_failed();
+        }
+        if(players<=0)
+        {
+            players=100;//防止连续弹窗
+            QString  str = "研发的游戏无人问津，游戏结束！";
+            QMessageBox::question(this,"游戏失败",str,QMessageBox::Yes, QMessageBox::No );
+            Game_failed();
+        }
+
+    }
+}
+
+/*******************************************************************
+函数名：Game_failed()
+入口参数：无
+出口参数：无
+功能：当玩家游戏结束出现提示框，让玩家选择是否重新开始游戏，或退到主界面。
+********************************************************************/
+void game::Game_failed()
+{
+//    QSoundEffect *login=new QSoundEffect(this);
+//    login->setSource(QUrl::fromLocalFile(":/res/gameover.wav"));
+//    login->play();
+    this->close();
+    QString  str = "游戏结束,最终游戏畅销榜排名"+QString::number(rank)+"，是否重新开始游戏";
+    if( QMessageBox::question(this,"游戏失败",str,
+        QMessageBox::Yes, QMessageBox::No )== QMessageBox::Yes)
+        {
+            players=0;
+            profit=0;
+            rank=150;
+            fever=2;
+            poach=0;
+            dangers=0;
+            working_computer=0;
+            working_staff=0;
+            time_over = Gametime*30;
+
+            ReFreshImage_1();//刷新label中的图片，使得所有label的图片都为空
+            gametime_id =startTimer(time_over*1000);//开启Qt定时器开启Qt定时器
+            ui->players->display (players);//开启玩家人数显示
+            ui->profit ->display (profit);//开启充值总额显示
+            ui->rank   ->display (rank);//开启畅销排行显示
+
+            time_day=1;
+            time_month=1;
+            ui->month->display(time_month);
+            ui->day->display (time_day);
+//            ui->day    ->display (time_over);//开启游戏计时显示
+
+            this->show();
+        }
+        else
+        {
+//           this->close();
+        }
+}
+
+/*******************************************************************
+函数名：ImageSwitcher_1(QLabel *label)
+入口参数：QLabel *label (lable控件指针)
+出口参数：无
+功能：切换传入的label的图片，变成working.jpg，开始拉人
+********************************************************************/
+void game::ImageSwitcher_1(QLabel *label)
+{
+    QImage *img = new QImage;
+    img->load(":/res/poaching.jpg");
+    label->setPixmap(QPixmap::fromImage(*img));
+    QSize laSize=label->size();//label_carema是要显示图片的label的名称
+    QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+    label->setPixmap(QPixmap::fromImage(image1));//显示
+}
+
+/*******************************************************************
+函数名：mousePressEvent(QMouseEvent *)
+入口参数：无
+出口参数：无
+功能：Qt鼠标点击函数,每次鼠标点击以后遍历所有lable控件。
+如果有点击的是lable_flag记录为真,则执行Click_right(),ImageSwitcher_1()函数，
+发出点击正确的声音和判断是否胜利，并切换图片。
+********************************************************************/
+void game::mousePressEvent(QMouseEvent *)
+{
+    QObjectList list = ui->groupBox->children();
+    QLabel *labelimage;
+    i=0;
+    foreach (QObject *obj, list)
+    {
+        labelimage = qobject_cast<QLabel*>(obj);
+        if(labelimage)
+        {
+            if(labelimage->geometry().contains(this->mapFromGlobal(QCursor::pos())))
+            {
+                //qDebug()<<labelimage;
+                //qDebug()<<lable_flag[i];
+                if(company[i].flag==true&&i!=25&&company[i].type!=3)
+                //if(lable_flag[i]==true&&i!=25)
+                {
+                    if(working_computer<computers&&staff>=company[i].guard)
+                    {
+                        Click_right();
+//                        if(company[i].type!=3)
+//                        {
+                            ImageSwitcher_1(labelimage);
+                            working_computer++;
+                            company[i].flag=false;
+//                            lable_flag[i]=false;
+//                        }
+                        qDebug()<<working_computer;
+
+                    }
+                    else if(working_computer==computers)
+                    {
+                        QLabel *labelimage;
+                        QObjectList list = ui->groupBox->children();
+                        QImage *img = new QImage;
+                        labelimage=qobject_cast<QLabel*>(list.value(25));
+                        img->load(":/res/lianxian.jpg");
+                        labelimage->setPixmap(QPixmap::fromImage(*img));
+                        QSize laSize=labelimage->size();
+                        QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+                        labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+                        //音效添加
+                        QSoundEffect *login=new QSoundEffect(this);
+                        login->setSource(QUrl::fromLocalFile(":/res/Slidermusic.wav"));
+                        login->play();
+                    }
+                    else if(staff<company[i].guard)
+                    {
+                        QLabel *labelimage;
+                        QObjectList list = ui->groupBox->children();
+                        QImage *img = new QImage;
+                        labelimage=qobject_cast<QLabel*>(list.value(25));
+                        img->load(":/res/laren.jpg");
+                        labelimage->setPixmap(QPixmap::fromImage(*img));
+                        QSize laSize=labelimage->size();
+                        QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+                        labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+                        //音效添加
+                        QSoundEffect *login=new QSoundEffect(this);
+                        login->setSource(QUrl::fromLocalFile(":/res/Slidermusic.wav"));
+                        login->play();
+                    }
+                }
+                else if(company[i].flag==true&&i!=25&&company[i].type==3)
+                {
+                    Click_right();
+//                    ImageSwitcher_2(labelimage);
+                }
+            }
+        }
+        i++;
+    }
+}
+
+/*******************************************************************
+函数名：Click_right()
+入口参数：无
+出口参数：无
+功能：当玩家点击正确时，执行该函数播放正确音效，增加玩家得分并显示，切换图片。
+并判断玩家是否获胜。
+********************************************************************/
+void game::Click_right()
+{
+//    players++;
+
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    int reporters=qrand()%10;
+    //0：普通，1：爆款，2：大厂，3：同行
+    switch (company[i].type)
+    {
+    case 0:
+        poach+=2;
+        qDebug()<<poach;
+        if(reporters+wall<=2)
+            dangers+=reporters;
+//        qDebug()<<dangers;
+        break;
+
+    case 1:
+        poach+=10;
+        qDebug()<<poach;
+//        qDebug()<<dangers;
+        break;
+
+    case 2:
+        poach+=6;
+        qDebug()<<poach;
+        if(reporters+wall<=5)
+            dangers+=reporters;
+//        qDebug()<<"dan"<<dangers;
+        break;
+
+    case 3:
+//        qDebug()<<dangers;
+        company[i].guard-=report;
+        if(company[i].guard<=0)
+        {
+            poach+=players/50;
+            company[i].flag=false;
+            QObjectList list = ui->groupBox->children();
+            QLabel *labelimage;
+            QImage *img = new QImage;
+            img->load(":/res/poaching.jpg");
+            labelimage=qobject_cast<QLabel*>(list.value(i));
+            labelimage->setPixmap(QPixmap::fromImage(*img));
+            QSize laSize=labelimage->size();//label_carema是要显示图片的label的名称
+            QImage image1=img->scaled(laSize,Qt::IgnoreAspectRatio);//重新调整图像大小以适应窗口
+            labelimage->setPixmap(QPixmap::fromImage(image1));//显示
+
+            //音效添加
+            QSoundEffect *login=new QSoundEffect(this);
+            login->setSource(QUrl::fromLocalFile(":/res/Buttonmusic.wav"));
+            login->play();
+        }
+        qDebug()<<company[i].guard;
+
+        break;
+
+    default:
+        break;
+    }
+    ui->players->display (players);
+    ui->dangers->display(dangers);//开启被举报数显示
+
+    //音效添加
+    QSoundEffect *login=new QSoundEffect(this);
+    login->setSource(QUrl::fromLocalFile(":/res/Clickright.wav"));
+    login->play();
+}
